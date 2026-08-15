@@ -1,0 +1,6 @@
+.env
+.venv/
+# L'historique est conservé par le cache privé de GitHub Actions, pas par Git.
+data/
+logs/
+__pycache__/

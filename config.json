@@ -1,0 +1,9 @@
+{
+  "whop_page": "https://whop.com/discover/app/app_QRxsQodZgK1r4D/",
+  "direct_campaign_page": "https://b4e0vdqv6zgqeqj4pfgm.apps.whop.com/discover",
+  "platforms": ["tiktok", "youtube shorts", "yt shorts"],
+  "primary_platform": "tiktok",
+  "send_existing_on_first_run": true,
+  "notify_on_changes": true
+}
+
