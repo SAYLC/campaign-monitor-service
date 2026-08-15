@@ -2,6 +2,7 @@ name: Surveillance Whop
 
 on:
   schedule:
+    # Toutes les 30 minutes. GitHub utilise l'heure UTC.
     - cron: "7,37 * * * *"
   workflow_dispatch:
 
@@ -21,13 +22,14 @@ jobs:
       CHECK_INTERVAL_MINUTES: "30"
       MIN_CPM: "0.80"
       MIN_TOTAL_BUDGET: "3000"
+      MIN_REMAINING_BUDGET: "3000"
       MAX_USED_PERCENT: "35"
       PREFERRED_USED_PERCENT: "25"
       MAX_FAST_DEADLINE_HOURS: "3"
       SHOW_BROWSER: "false"
 
     steps:
-      - name: Telecharger le bot
+      - name: Télécharger le bot
         uses: actions/checkout@v4
 
       - name: Installer Python
@@ -36,7 +38,7 @@ jobs:
           python-version: "3.11"
           cache: pip
 
-      - name: Restaurer historique
+      - name: Restaurer l'historique
         uses: actions/cache@v4
         with:
           path: data/state.json
@@ -44,10 +46,10 @@ jobs:
           restore-keys: |
             whop-state-
 
-      - name: Installer les dependances
+      - name: Installer les dépendances
         run: pip install -r requirements.txt
 
-      - name: Verifier le secret Discord
+      - name: Vérifier le secret Discord
         shell: bash
         run: |
           if [ -z "$DISCORD_WEBHOOK_URL" ]; then
