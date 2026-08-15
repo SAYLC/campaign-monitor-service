@@ -119,7 +119,7 @@ def load_settings() -> Settings:
         interval_minutes=max(1, env_int("CHECK_INTERVAL_MINUTES", 30)),
         min_cpm=env_float("MIN_CPM", 0.80),
         min_budget=env_float("MIN_TOTAL_BUDGET", 3000),
-        max_used_percent=env_float("MAX_USED_PERCENT", 35),
+        max_used_percent=env_float("MAX_USED_PERCENT", 30),
         preferred_used_percent=env_float("PREFERRED_USED_PERCENT", 25),
         max_fast_deadline_hours=env_float("MAX_FAST_DEADLINE_HOURS", 3),
         show_browser=os.getenv("SHOW_BROWSER", "false").lower() == "true",
@@ -654,7 +654,6 @@ def run_scan(browser: Browser, settings: Settings, state: dict[str, Any]) -> Non
         )
         campaigns = scan_campaigns(page, settings)
         previous = state["campaigns"]
-        first_run = not state.get("initialized", False)
         sent = 0
         seen_keys: set[str] = set()
 
@@ -663,16 +662,8 @@ def run_scan(browser: Browser, settings: Settings, state: dict[str, Any]) -> Non
             seen_keys.add(key)
             fingerprint = campaign.fingerprint()
             old = previous.get(key)
-            changed = bool(old and old.get("fingerprint") != fingerprint)
             discord_message_id = old.get("discord_message_id") if old else None
-            should_send = (
-                (first_run and settings.send_existing)
-                or old is None
-                or (changed and settings.notify_changes)
-            )
-
-            if campaign.rating == "À ÉVITER":
-                should_send = False
+            should_send = campaign.rating != "À ÉVITER"
 
             if should_send:
                 translate_campaign(campaign, state)
@@ -683,20 +674,14 @@ def run_scan(browser: Browser, settings: Settings, state: dict[str, Any]) -> Non
                     color_index = int(state.get("next_color", 0))
                     discord_color = EMBED_COLORS[color_index % len(EMBED_COLORS)]
                     state["next_color"] = color_index + 1
-                payload = discord_payload(campaign, changed, int(discord_color))
-                if changed and discord_message_id:
+                payload = discord_payload(campaign, False, int(discord_color))
+                if discord_message_id:
                     try:
-                        edit_discord(settings.webhook, discord_message_id, payload)
+                        delete_discord(settings.webhook, discord_message_id)
                     except RuntimeError as exc:
                         if "Erreur Discord 404" not in str(exc):
                             raise
-                        log(
-                            f"Message Discord absent pour « {campaign.title} », "
-                            "création d'un nouveau."
-                        )
-                        discord_message_id = send_discord(settings.webhook, payload)
-                else:
-                    discord_message_id = send_discord(settings.webhook, payload)
+                discord_message_id = send_discord(settings.webhook, payload)
                 sent += 1
                 time.sleep(1)
 

@@ -40,8 +40,9 @@ personnelles du compte GitHub.
 
 - au moins 0,80 $ pour 1 000 vues ;
 - budget total d'au moins 3 000 $ ;
-- 35 % maximum de la cagnotte déjà utilisée ;
+- 30 % maximum de la cagnotte déjà utilisée (au moins 70 % restante) ;
 - priorité aux cagnottes utilisées à 25 % ou moins ;
+- à chaque passage, l'ancienne liste est remplacée par toutes les offres encore acceptables ;
 - TikTok en priorité, YouTube Shorts accepté ;
 - campagnes imposant moins de 3 heures signalées et écartées ;
 - obligation de renommer le profil clairement signalée ;
