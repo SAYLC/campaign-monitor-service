@@ -52,7 +52,6 @@ class Settings:
     interval_minutes: int
     min_cpm: float
     min_budget: float
-    min_remaining_budget: float
     max_used_percent: float
     preferred_used_percent: float
     max_fast_deadline_hours: float
@@ -120,7 +119,6 @@ def load_settings() -> Settings:
         interval_minutes=max(1, env_int("CHECK_INTERVAL_MINUTES", 30)),
         min_cpm=env_float("MIN_CPM", 0.80),
         min_budget=env_float("MIN_TOTAL_BUDGET", 3000),
-        min_remaining_budget=env_float("MIN_REMAINING_BUDGET", 3000),
         max_used_percent=env_float("MAX_USED_PERCENT", 35),
         preferred_used_percent=env_float("PREFERRED_USED_PERCENT", 25),
         max_fast_deadline_hours=env_float("MAX_FAST_DEADLINE_HOURS", 3),
@@ -309,7 +307,6 @@ def basic_match(campaign: Campaign, settings: Settings) -> bool:
     return (
         campaign.cpm >= settings.min_cpm
         and campaign.total_budget >= settings.min_budget
-        and campaign.remaining >= settings.min_remaining_budget
         and campaign.used_percent <= settings.max_used_percent
     )
 
