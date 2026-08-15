@@ -685,7 +685,16 @@ def run_scan(browser: Browser, settings: Settings, state: dict[str, Any]) -> Non
                     state["next_color"] = color_index + 1
                 payload = discord_payload(campaign, changed, int(discord_color))
                 if changed and discord_message_id:
-                    edit_discord(settings.webhook, discord_message_id, payload)
+                    try:
+                        edit_discord(settings.webhook, discord_message_id, payload)
+                    except RuntimeError as exc:
+                        if "Erreur Discord 404" not in str(exc):
+                            raise
+                        log(
+                            f"Message Discord absent pour « {campaign.title} », "
+                            "création d'un nouveau."
+                        )
+                        discord_message_id = send_discord(settings.webhook, payload)
                 else:
                     discord_message_id = send_discord(settings.webhook, payload)
                 sent += 1
@@ -711,6 +720,10 @@ def run_scan(browser: Browser, settings: Settings, state: dict[str, Any]) -> Non
                     delete_discord(settings.webhook, message_id)
                 del previous[key]
             except Exception as exc:
+                if "Erreur Discord 404" in str(exc):
+                    # Le message a déjà été supprimé manuellement sur Discord.
+                    del previous[key]
+                    continue
                 # On garde l'entrée afin de retenter la suppression au scan suivant.
                 log(f"Suppression Discord à retenter pour {key} : {exc}")
 
